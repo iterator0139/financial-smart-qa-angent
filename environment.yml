@@ -1,0 +1,20 @@
+name: smart-qa # Choose a name for your conda environment
+channels:
+  - pytorch # For PyTorch
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.9 # Specify your desired Python version
+  - pytorch::pytorch # Or pytorch for CPU version if you don't have a Mac with Metal support for PyTorch
+  - scikit-learn
+  - jieba
+  - pip
+  - pip:
+    - modelscope
+    - transformers
+    - langchain
+    - langchain-huggingface
+    - langgraph
+    - accelerate
+    - tiktoken
+    - einops
