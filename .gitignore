@@ -5,4 +5,5 @@ __pycache__/
 .venv/
 *.log
 .idea/
-.vscode/ 
+.vscode/
+bs_challenge_financial_14b_dataset/ 
