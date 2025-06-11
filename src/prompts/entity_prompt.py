@@ -108,7 +108,7 @@ entity_relation = [
     { "head": "招股说明书", "tail": "公司名称", "type": "描述对象", "description": "招股说明书对应的公司" }
 ]
 
-prompt_template = """
+ENTITY_EXTRACTION_PROMPT = """
 你是一个结构化信息抽取助手，请根据下方提供的实体类型定义，从输入文本中抽取出所有匹配的实体。输出格式要求为 JSON，且字段名严格一致。
 
 【实体类型定义】
@@ -162,4 +162,5 @@ prompt_template = """
 
 【待抽取文本】
 {{INPUT_TEXT}}
+
 """

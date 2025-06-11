@@ -1,0 +1,39 @@
+api:
+  qwen:
+    api_key: "your_dashscope_api_key"  # 通义千问API密钥
+    base_url: ""  # 默认为空，使用官方API地址
+    model_list:
+      - qwen-turbo  # 快速模型
+      - qwen-plus   # 高级模型
+      - qwq-plus    # 流式高级模型
+    # 是否全局启用流式输出(可在运行时动态更改)
+    stream_enabled: true
+    # 流式输出的模型列表(这些模型会使用流式API)
+    streaming_models:
+      - qwq-32b
+      - qwq-plus
+      - qwq-plus-latest
+    default_params:
+      temperature: 0.7  # 温度参数，越高越有创造性
+      top_p: 0.8        # 核采样参数
+      timeout: 60       # 超时时间（秒）
+    retry:
+      max_attempts: 3  # 最大重试次数
+      min_seconds: 1   # 最小重试间隔（秒）
+      max_seconds: 10  # 最大重试间隔（秒）
+      factor: 2        # 重试间隔增长因子
+
+  openai:
+    api_key: "your_openai_api_key"  # OpenAI API密钥
+    base_url: ""  # 默认为空，使用官方API地址
+    model_list:
+      - gpt-4
+      - gpt-3.5-turbo
+    default_params:
+      temperature: 0.7
+      timeout: 60
+    retry:
+      max_attempts: 3
+      min_seconds: 1
+      max_seconds: 10
+      factor: 2 

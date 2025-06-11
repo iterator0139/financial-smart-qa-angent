@@ -29,7 +29,7 @@ intentions = {
         "topk",
     ],
 }
-PROMPT_QUERY_UNDERSTANDING = """
+QUERY_UNDERSTANDING_PROMPT = """
 你是一个意图理解助手，请根据下方提供的意图类目体系，理解用户意图。
 
 意图类目体系如下:
@@ -49,6 +49,7 @@ PROMPT_QUERY_UNDERSTANDING = """
 {
   "intentions": ["股票查询", "股票行情指标计算", "四舍五入保留精度", "topk"]
 }
-
+【待理解文本】
+{{INPUT_TEXT}}
 """
 

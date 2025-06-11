@@ -1,42 +1,88 @@
-from langchain_openai import ChatOpenAI
-from src.prompts import qu_prompt
-from vllm import VLLMClient
-from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig, TextStreamer
-from modelscope import AutoModelForCausalLM, AutoTokenizer, snapshot_download
-from ollama import OllamaClient
+from src.prompts import WORD_SEGMENTATION_PROMPT, ENTITY_EXTRACTION_PROMPT, QUERY_UNDERSTANDING_PROMPT
+from src.utils.logger import get_logger
+from langchain_core.prompts import ChatPromptTemplate
+from src.models.streaming_adapter import STREAMING_MODELS, StreamingLLMAdapter
 
 class QuModel:
-    def __init__(self):
-        self.llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
-        self.prompt = qu_prompt.PROMPT_QUERY_UNDERSTANDING
+    def __init__(self, state, node_name):
+        self.log = get_logger()
+        self.state = state
+        self.node_name = node_name
+        self.model = self.get_model_by_node_name(node_name)
+        self.prompt = self.get_prompt_by_node_name(node_name)
+        self.template_variables = self.get_template_variables_by_node_name(node_name)
+        self.qwen_llm = StreamingLLMAdapter(
+            model=self.model,
+            api_key=self.state["config"].get("api.qwen.api_key"),
+            base_url=self.state["config"].get("api.qwen.base_url", ""),
+            streaming_models=self.state["config"].get("api.qwen.streaming_models", STREAMING_MODELS),
+            stream_enabled=self.state["config"].get("api.qwen.stream_enabled", True),
+            **self.state["config"].get("api.qwen.default_params", {})
+        )
+    
+    def get_model_by_node_name(self, node_name) -> str:
+        if node_name == "word_segmentation":
+            return self.state.get("segment_model")
+        elif node_name == "ner":
+            return self.state.get("ner_model")
+        elif node_name == "intent":
+            return self.state.get("intent_model")
+        else:
+            return None
+    
+    def get_prompt_by_node_name(self, node_name) -> str:
+        if node_name == "word_segmentation":
+            return WORD_SEGMENTATION_PROMPT
+        elif node_name == "ner":
+            return ENTITY_EXTRACTION_PROMPT
+        elif node_name == "intent":
+            return QUERY_UNDERSTANDING_PROMPT
+        else:
+            return None
+    
+    def get_template_variables_by_node_name(self, node_name) -> dict:
+        if node_name == "word_segmentation":
+            return {"INPUT_TEXT": self.state.get("query")}
+        elif node_name == "ner":
+            return {"INPUT_TEXT": self.state.get("query")}
+        elif node_name == "intent":
+            return {"INPUT_TEXT": self.state.get("query")}
+        else:
+            return None
 
-    def call_llm(self, query: str) -> str:
-        prompt = self.prompt.format(input_data=query)
-        return self.llm.invoke(prompt).content
-
-
-    # use local vllm server model， localhost:11434
-    def call_llm_by_vllm(self, query: str) -> list[str]:
-        # use vllm server model
-        vllm_client = VLLMClient(host="localhost", port=11434)
-        vllm_client.generate(query)
-        return vllm_client.generate(query)
-
-
-
-    def call_llm_by_huggingface(self, query: str) -> list[str]:
-        model_dir = snapshot_download('TongyiFinance/Tongyi-Finance-14B')
-        tokenizer = AutoTokenizer.from_pretrained(model_dir, trust_remote_code=True)
-        model = AutoModelForCausalLM.from_pretrained(model_dir, device_map="cpu", trust_remote_code=True).eval()
-        model.generation_config = GenerationConfig.from_pretrained(model_dir, trust_remote_code=True)
-        inputs = tokenizer(query, return_tensors='pt')
-        inputs = inputs.to(model.device)
-        streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
-        pred = model.generate(**inputs, streamer=streamer)
-        return tokenizer.decode(pred.cpu()[0], skip_special_tokens=True).split("\n")
-
-    def call_llm_by_ollama(self, query: str) -> list[str]:
-        # use ollama model
-        ollama_client = OllamaClient(host="http://localhost:11434")
-        ollama_client.generate(query)
-        return ollama_client.generate(query)    
+    def call_llm_by_aliyun_api(self) -> dict:
+        # 使用 Jinja2 风格的模板语法
+        prompt = ChatPromptTemplate.from_template(
+            self.prompt,
+            template_format="jinja2"
+        )
+        # 创建链
+        chain = prompt | self.qwen_llm
+        
+        # 查看拼接后的prompt
+        formatted_messages = prompt.format_messages(**self.template_variables)
+        self.log.info(f"{self.node_name} prompt内容:")
+        for message in formatted_messages:
+            self.log.info(f"Role: {message.type}, Content: {message.content}")
+        
+        # 调用模型
+        try:
+            result = chain.invoke(self.template_variables)
+            
+            # 检查是否有思考过程
+            reasoning = None
+            if hasattr(result, 'additional_kwargs') and 'reasoning' in result.additional_kwargs:
+                reasoning = result.additional_kwargs['reasoning']
+                self.log.info(f"{self.node_name}思考过程: {reasoning}")
+            
+            self.log.info(f"{self.node_name} 完成，结果长度: {len(result.content)}, 结果: {result.content}")
+            
+            # 返回结果，包括思考过程（如果有）
+            result_dict = {"final_output": result.content}
+            if reasoning:
+                result_dict["final_reasoning"] = reasoning
+                
+            return result_dict
+        except Exception as e:
+            self.log.error(f"{self.node_name}失败: {str(e)}")
+            raise
