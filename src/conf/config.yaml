@@ -1,0 +1,52 @@
+# Production Environment Configuration
+
+server:
+  host: '0.0.0.0'
+  port: 5000
+  debug: false
+  workers: 4
+
+logging:
+  level: 'INFO'
+  file_rotation: true
+  max_bytes: 52428800  # 50MB
+  backup_count: 20
+
+api:
+  openai:
+    timeout: 90
+    retry:
+      max_attempts: 5
+      initial_delay: 2
+    rate_limit:
+      requests_per_minute: 200
+  
+  qwen:
+    api_key: "sk-e68b5fd9481c49a1a81cf63684d4d48b"
+    endpoint: "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation"
+    base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+    timeout: 30
+    model_version: "qwen-turbo"
+    segment_model: "qwen-turbo"
+    ner_model: "qwen-turbo"
+    intent_model: "qwen-turbo"
+    model_list:
+      - qwen-turbo  # 快速模型
+      - qwen-plus   # 高级模型
+      - qwq-plus    # 流式高级模型
+    # 是否全局启用流式输出(可在运行时动态更改) 
+    stream_enabled: true
+    # 流式输出的模型列表(这些模型会使用流式API)
+    streaming_models:
+      - qwq-32b
+      - qwq-plus
+      - qwq-plus-latest
+    retry:
+      max_attempts: 3
+      initial_delay: 1
+    rate_limit:
+      requests_per_minute: 60
+    default_params:
+      temperature: 0.7
+      top_p: 0.8
+      max_tokens: 5000
