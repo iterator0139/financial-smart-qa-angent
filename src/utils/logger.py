@@ -148,6 +148,8 @@ class AsyncLogger:
             for handler in logger.handlers[:]:
                 logger.removeHandler(handler)
             logger.addHandler(self.queue_handler)
+            # 阻止日志传播到root logger，避免重复
+            logger.propagate = False
             self.loggers[name] = logger
         return self.loggers[name]
     

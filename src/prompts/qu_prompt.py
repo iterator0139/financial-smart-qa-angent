@@ -1,3 +1,5 @@
+import json
+
 intentions = {
     "基金股票信息查询类意图": [
         "基金持仓债券查询",
@@ -29,11 +31,15 @@ intentions = {
         "topk",
     ],
 }
+
+# 先用json.dumps处理intentions
+intentions_json = json.dumps(intentions, ensure_ascii=False, indent=2)
+
 QUERY_UNDERSTANDING_PROMPT = """
 你是一个意图理解助手，请根据下方提供的意图类目体系，理解用户意图。
 
 意图类目体系如下:
-{{intentions}}
+""" + intentions_json + """
 
 请严格按以下处理流程处理问题意图:
 1、意图理解，根据意图类目体系，依据上面所有信息，理解意图，得到意图数组。
@@ -49,6 +55,7 @@ QUERY_UNDERSTANDING_PROMPT = """
 {
   "intentions": ["股票查询", "股票行情指标计算", "四舍五入保留精度", "topk"]
 }
+
 【待理解文本】
 {{INPUT_TEXT}}
 """

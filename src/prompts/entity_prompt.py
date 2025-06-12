@@ -1,3 +1,5 @@
+import json
+
 entity_definition = [
     {
       "category": "基金类",
@@ -108,14 +110,18 @@ entity_relation = [
     { "head": "招股说明书", "tail": "公司名称", "type": "描述对象", "description": "招股说明书对应的公司" }
 ]
 
+# 先用json.dumps处理变量
+entity_definition_json = json.dumps(entity_definition, ensure_ascii=False, indent=2)
+entity_relation_json = json.dumps(entity_relation, ensure_ascii=False, indent=2)
+
 ENTITY_EXTRACTION_PROMPT = """
 你是一个结构化信息抽取助手，请根据下方提供的实体类型定义，从输入文本中抽取出所有匹配的实体。输出格式要求为 JSON，且字段名严格一致。
 
 【实体类型定义】
-{entity_definition}
+""" + entity_definition_json + """
 
 【实体关系定义】
-{entity_relation}
+""" + entity_relation_json + """
 
 【任务要求】
 - 请识别并抽取文本中出现的所有实体，输出每个实体的：
@@ -140,14 +146,14 @@ ENTITY_EXTRACTION_PROMPT = """
 【示例输出】
 {
   "entities": [
-  { "entity_type": "基金", "text": "易方达蓝筹精选混合", "start": 0, "end": 11 },
-  { "entity_type": "基金代码", "text": "005827", "start": 18, "end": 24 },
-  { "entity_type": "日期", "text": "2023年第一季度", "start": 25, "end": 34 },
-  { "entity_type": "股票", "text": "贵州茅台", "start": 37, "end": 41 },
-  { "entity_type": "股票代码", "text": "600519", "start": 42, "end": 48 },
-  { "entity_type": "数量", "text": "1200万股", "start": 49, "end": 54 },
-  { "entity_type": "金额", "text": "123亿元", "start": 60, "end": 65 }
-],
+    { "entity_type": "基金", "text": "易方达蓝筹精选混合", "start": 0, "end": 11 },
+    { "entity_type": "基金代码", "text": "005827", "start": 18, "end": 24 },
+    { "entity_type": "日期", "text": "2023年第一季度", "start": 25, "end": 34 },
+    { "entity_type": "股票", "text": "贵州茅台", "start": 37, "end": 41 },
+    { "entity_type": "股票代码", "text": "600519", "start": 42, "end": 48 },
+    { "entity_type": "数量", "text": "1200万股", "start": 49, "end": 54 },
+    { "entity_type": "金额", "text": "123亿元", "start": 60, "end": 65 }
+  ],
   "relations": [
     { "head": "基金", "tail": "股票", "type": "持仓", "description": "基金持有某股票" },
     { "head": "股票", "tail": "数量", "type": "持仓", "description": "股票持仓数量" },
@@ -156,11 +162,10 @@ ENTITY_EXTRACTION_PROMPT = """
     { "head": "股票", "tail": "所属国家或地区", "type": "所属", "description": "股票所属国家或地区" },
     { "head": "股票", "tail": "债券", "type": "持仓", "description": "股票持有某债券" },
     { "head": "股票", "tail": "可转债", "type": "持仓", "description": "股票持有某可转债" },
-    { "head": "股票", "tail": "基金管理人", "type": "管理", "description": "股票由某机构管理" },
+    { "head": "股票", "tail": "基金管理人", "type": "管理", "description": "股票由某机构管理" }
   ]
 }
 
 【待抽取文本】
 {{INPUT_TEXT}}
-
 """
