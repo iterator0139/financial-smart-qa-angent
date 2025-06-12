@@ -12,7 +12,7 @@ import operator
 from langgraph.graph import StateGraph, END
 from src.query_understanding.qu_subgraph import build_qu_subgraph, QuState
 from src.config.config_manager import ConfigManager
-from src.utils.logger import logger
+from src.utils.logger import logger, get_logger
 
 # Initialize config manager
 config_manager = ConfigManager()
@@ -108,8 +108,11 @@ if __name__ == '__main__':
     # Example usage
     graph_app = build_graph()
     
+    # Get logger instance
+    log = get_logger("main")
+    
     # Test with a sample query
-    test_query = "请帮我计算，在20210105，中信行业分类划分的一级行业为综合金融行业中，涨跌幅最大股票的股票代码是？涨跌幅是多少？"
+    test_query = "请查询在20211125日期，中信行业分类下机械一级行业中，当日收盘价波动最大（即最高价与最低价之差最大）的股票代码是什么？"
     initial_state = {
         "query": test_query, 
         "config": config_manager,
@@ -118,20 +121,19 @@ if __name__ == '__main__':
         "intent_model": config_manager.get("api.qwen.intent_model")
     }
 
-    print(f"Invoking graph with query: '{test_query}'")
+    log.info(f"Invoking graph with query: '{test_query}'")
     final_state = graph_app.invoke(initial_state)
 
-    print("\n--- Final Graph State ---")
-    print(f"Query: {final_state.get('query')}")
-    print(f"Segmented Words: {final_state.get('segmented_words')}")
-    print(f"Entities: {final_state.get('entities')}")
-    print(f"Rewritten Entities: {final_state.get('rewritten_entities')}")
-    print(f"Intent: {final_state.get('intent')}")
-    print(f"Config: {final_state.get('config')}")
-    print(f"Segment Model: {final_state.get('segment_model')}")
-    print(f"Ner Model: {final_state.get('ner_model')}")
-    print(f"Intent Model: {final_state.get('intent_model')}")
+    log.info("\n--- Final Graph State ---")
+    log.info(f"Query: {final_state.get('query')}")
+    log.info(f"Segmented Words: {final_state.get('segmented_words')}")
+    log.info(f"Entities: {final_state.get('entities')}")
+    log.info(f"Intent: {final_state.get('intent')}")
+    log.info(f"Config: {final_state.get('config')}")
+    log.info(f"Segment Model: {final_state.get('segment_model')}")
+    log.info(f"Ner Model: {final_state.get('ner_model')}")
+    log.info(f"Intent Model: {final_state.get('intent_model')}")
     if final_state.get('error'):
-        print(f"Error: {final_state.get('error')}")
+        log.info(f"Error: {final_state.get('error')}")
 
 
