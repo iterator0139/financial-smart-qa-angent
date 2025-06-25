@@ -1,0 +1,1454 @@
+{
+  "db_path": "bs_challenge_financial_14b_dataset/dataset/博金杯比赛数据.db",
+  "db_name": "博金杯比赛数据",
+  "tables": [
+    {
+      "table_name": "基金基本信息",
+      "columns": [
+        {
+          "name": "基金代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "基金全称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "基金简称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "管理人",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "托管人",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "基金类型",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "成立日期",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "到期日期",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "管理费率",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "托管费率",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [],
+      "constraints": [],
+      "sample_data": {
+        "columns": [
+          "基金代码",
+          "基金全称",
+          "基金简称",
+          "管理人",
+          "托管人",
+          "基金类型",
+          "成立日期",
+          "到期日期",
+          "管理费率",
+          "托管费率"
+        ],
+        "rows": [
+          [
+            "000006",
+            "西部利得量化成长混合型发起式证券投资基金A类",
+            "西部利得量化成长混合A",
+            "西部利得基金管理有限公司",
+            "中国农业银行股份有限公司",
+            "混合型",
+            "20190319",
+            "30001231",
+            "1.2%",
+            "0.1%"
+          ],
+          [
+            "000028",
+            "华富安鑫债券型证券投资基金",
+            "华富安鑫债券",
+            "华富基金管理有限公司",
+            "上海浦东发展银行股份有限公司",
+            "债券型",
+            "20190612",
+            "30001231",
+            "0.7%",
+            "0.2%"
+          ],
+          [
+            "000030",
+            "长城核心优选灵活配置混合型证券投资基金A类",
+            "长城核心优选灵活配置混合A",
+            "长城基金管理有限公司",
+            "中国建设银行股份有限公司",
+            "混合型",
+            "20190524",
+            "30001231",
+            "1.2%",
+            "0.2%"
+          ]
+        ]
+      },
+      "business_description": "存储基金的基本信息，包括基金代码、名称、管理人、托管人、成立日期等核心信息。主要字段包括: 基金代码, 基金全称, 基金简称, 管理人, 托管人。"
+    },
+    {
+      "table_name": "基金股票持仓明细",
+      "columns": [
+        {
+          "name": "基金代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "基金简称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "持仓日期",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "股票代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "股票名称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "数量",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "市值",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "市值占基金资产净值比",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "第N大重仓股",
+          "type": "INTEGER",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "所在证券市场",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "所属国家(地区)",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "报告类型",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [],
+      "constraints": [],
+      "sample_data": {
+        "columns": [
+          "基金代码",
+          "基金简称",
+          "持仓日期",
+          "股票代码",
+          "股票名称",
+          "数量",
+          "市值",
+          "市值占基金资产净值比",
+          "第N大重仓股",
+          "所在证券市场",
+          "所属国家(地区)",
+          "报告类型"
+        ],
+        "rows": [
+          [
+            "007484",
+            "信澳核心科技混合A",
+            "20201231",
+            "600563",
+            "法拉电子",
+            151369.0,
+            16279735.95,
+            0.0257,
+            4,
+            "上海证券交易所",
+            "中华人民共和国",
+            "季报"
+          ],
+          [
+            "006713",
+            "前海开源MSCI中国A股消费指数C",
+            "20210630",
+            "002216",
+            "三全食品",
+            21770.0,
+            358551.9,
+            0.0021,
+            2,
+            "深圳证券交易所",
+            "中华人民共和国",
+            "年报(含半年报)"
+          ],
+          [
+            "008935",
+            "大成科技消费股票C",
+            "20210630",
+            "300991",
+            "创益通",
+            335.0,
+            9662.5,
+            0.0,
+            93,
+            "深圳证券交易所",
+            "中华人民共和国",
+            "年报(含半年报)"
+          ]
+        ]
+      },
+      "business_description": "记录基金持有股票的详细信息，包括持仓数量、市值、占比等投资组合数据。主要字段包括: 基金代码, 基金简称, 持仓日期, 股票代码, 股票名称。"
+    },
+    {
+      "table_name": "基金债券持仓明细",
+      "columns": [
+        {
+          "name": "基金代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "基金简称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "持仓日期",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "债券类型",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "债券名称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "持债数量",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "持债市值",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "持债市值占基金资产净值比",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "第N大重仓股",
+          "type": "INTEGER",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "所在证券市场",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "所属国家(地区)",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "报告类型",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [],
+      "constraints": [],
+      "sample_data": {
+        "columns": [
+          "基金代码",
+          "基金简称",
+          "持仓日期",
+          "债券类型",
+          "债券名称",
+          "持债数量",
+          "持债市值",
+          "持债市值占基金资产净值比",
+          "第N大重仓股",
+          "所在证券市场",
+          "所属国家(地区)",
+          "报告类型"
+        ],
+        "rows": [
+          [
+            "010005",
+            "鹏扬现金通利货币E",
+            "20210331",
+            "超短期融资券",
+            "21华能水电SCP002",
+            200000.0,
+            20000180.24,
+            0.0253,
+            9,
+            "银行间市场",
+            "中华人民共和国",
+            "季报"
+          ],
+          [
+            "007659",
+            "博时富汇纯债3个月定期开放债券",
+            "20191231",
+            "公司债券",
+            "16恒健01",
+            800000.0,
+            79832000.0,
+            0.0825,
+            1,
+            "上海证券交易所",
+            "中华人民共和国",
+            "年报(含半年报)"
+          ],
+          [
+            "007659",
+            "博时富汇纯债3个月定期开放债券",
+            "20200331",
+            "公司债券",
+            "16恒健01",
+            800000.0,
+            80536000.0,
+            0.0832,
+            2,
+            "上海证券交易所",
+            "中华人民共和国",
+            "季报"
+          ]
+        ]
+      },
+      "business_description": "记录基金持有债券的详细信息，包括债券类型、持仓数量、市值占比等。主要字段包括: 基金代码, 基金简称, 持仓日期, 债券类型, 债券名称。"
+    },
+    {
+      "table_name": "基金可转债持仓明细",
+      "columns": [
+        {
+          "name": "基金代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "基金简称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "持仓日期",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "对应股票代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "债券名称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "数量",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "市值",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "市值占基金资产净值比",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "第N大重仓股",
+          "type": "INTEGER",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "所在证券市场",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "所属国家(地区)",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "报告类型",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [],
+      "constraints": [],
+      "sample_data": {
+        "columns": [
+          "基金代码",
+          "基金简称",
+          "持仓日期",
+          "对应股票代码",
+          "债券名称",
+          "数量",
+          "市值",
+          "市值占基金资产净值比",
+          "第N大重仓股",
+          "所在证券市场",
+          "所属国家(地区)",
+          "报告类型"
+        ],
+        "rows": [
+          [
+            "006650",
+            "招商安庆债券",
+            "20191231",
+            "300568",
+            "星源转债",
+            1815.0,
+            225989.4,
+            0.0013,
+            36,
+            "深圳证券交易所",
+            "中华人民共和国",
+            "季报"
+          ],
+          [
+            "006006",
+            "诺安鼎利混合C",
+            "20190930",
+            "300568",
+            "星源转债",
+            6781.0,
+            776260.8,
+            0.0062,
+            29,
+            "深圳证券交易所",
+            "中华人民共和国",
+            "季报"
+          ],
+          [
+            "006467",
+            "浦银安盛双债增强债券C",
+            "20191231",
+            "300568",
+            "星源转债",
+            4987.0,
+            620850.0,
+            0.003,
+            19,
+            "深圳证券交易所",
+            "中华人民共和国",
+            "季报"
+          ]
+        ]
+      },
+      "business_description": "记录基金持有可转债的详细信息，包括对应股票代码、持仓数量等。主要字段包括: 基金代码, 基金简称, 持仓日期, 对应股票代码, 债券名称。"
+    },
+    {
+      "table_name": "基金日行情表",
+      "columns": [
+        {
+          "name": "基金代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "交易日期",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "单位净值",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "复权单位净值",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "累计单位净值",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "资产净值",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [],
+      "constraints": [],
+      "sample_data": {
+        "columns": [
+          "基金代码",
+          "交易日期",
+          "单位净值",
+          "复权单位净值",
+          "累计单位净值",
+          "资产净值"
+        ],
+        "rows": [
+          [
+            "007120",
+            "20210120",
+            2.162,
+            2.162,
+            2.162,
+            3282338328.05
+          ],
+          [
+            "006845",
+            "20210603",
+            1.2599,
+            1.2599,
+            1.2599,
+            2692024.53
+          ],
+          [
+            "010157",
+            "20211221",
+            1.1338,
+            1.1338,
+            1.1338,
+            137142492.09
+          ]
+        ]
+      },
+      "business_description": "记录基金每日的交易行情数据，包括单位净值、累计净值、资产净值等。主要字段包括: 基金代码, 交易日期, 单位净值, 复权单位净值, 累计单位净值。"
+    },
+    {
+      "table_name": "A股票日行情表",
+      "columns": [
+        {
+          "name": "股票代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "交易日",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "昨收盘(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "今开盘(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "最高价(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "最低价(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "收盘价(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "成交量(股)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "成交金额(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [
+        "idx_trade_date",
+        "idx_stock_code"
+      ],
+      "constraints": [],
+      "sample_data": {
+        "columns": [
+          "股票代码",
+          "交易日",
+          "昨收盘(元)",
+          "今开盘(元)",
+          "最高价(元)",
+          "最低价(元)",
+          "收盘价(元)",
+          "成交量(股)",
+          "成交金额(元)"
+        ],
+        "rows": [
+          [
+            "603665",
+            "20190131",
+            28.32,
+            27.5,
+            28.09,
+            25.49,
+            27.28,
+            1757953.0,
+            48247793.0
+          ],
+          [
+            "300180",
+            "20190104",
+            11.07,
+            10.99,
+            11.25,
+            10.98,
+            11.16,
+            2269600.0,
+            25305087.0
+          ],
+          [
+            "300071",
+            "20190115",
+            3.87,
+            3.87,
+            3.96,
+            3.83,
+            3.93,
+            17855227.0,
+            69867668.0
+          ]
+        ]
+      },
+      "business_description": "A股市场股票的日行情数据，包括开盘价、收盘价、最高价、最低价、成交量等。主要字段包括: 股票代码, 交易日, 昨收盘(元), 今开盘(元), 最高价(元)。"
+    },
+    {
+      "table_name": "港股票日行情表",
+      "columns": [
+        {
+          "name": "股票代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "交易日",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "昨收盘(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "今开盘(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "最高价(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "最低价(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "收盘价(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "成交量(股)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "成交金额(元)",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [],
+      "constraints": [],
+      "sample_data": {
+        "columns": [
+          "股票代码",
+          "交易日",
+          "昨收盘(元)",
+          "今开盘(元)",
+          "最高价(元)",
+          "最低价(元)",
+          "收盘价(元)",
+          "成交量(股)",
+          "成交金额(元)"
+        ],
+        "rows": [
+          [
+            "47 HK",
+            "20190125",
+            0.162,
+            0.16,
+            0.164,
+            0.16,
+            0.163,
+            68000.0,
+            10908.0
+          ],
+          [
+            "08210",
+            "20190107",
+            0.65,
+            0.64,
+            0.66,
+            0.58,
+            0.63,
+            10460000.0,
+            6488500.0
+          ],
+          [
+            "2280 HK",
+            "20190109",
+            4.19,
+            4.19,
+            4.31,
+            4.24,
+            4.29,
+            1387500.0,
+            5950695.0
+          ]
+        ]
+      },
+      "business_description": "港股市场股票的日行情数据，包括开盘价、收盘价、最高价、最低价、成交量等。主要字段包括: 股票代码, 交易日, 昨收盘(元), 今开盘(元), 最高价(元)。"
+    },
+    {
+      "table_name": "A股公司行业划分表",
+      "columns": [
+        {
+          "name": "股票代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "交易日期",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "行业划分标准",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "一级行业名称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "二级行业名称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [],
+      "constraints": [],
+      "sample_data": {
+        "columns": [
+          "股票代码",
+          "交易日期",
+          "行业划分标准",
+          "一级行业名称",
+          "二级行业名称"
+        ],
+        "rows": [
+          [
+            "000065",
+            "20190115",
+            "中信行业分类",
+            "建筑",
+            "建筑施工Ⅱ"
+          ],
+          [
+            "300502",
+            "20190125",
+            "中信行业分类",
+            "通信",
+            "通信设备"
+          ],
+          [
+            "600481",
+            "20190120",
+            "中信行业分类",
+            "机械",
+            "专用机械"
+          ]
+        ]
+      },
+      "business_description": "A股公司的行业分类信息，包括行业划分标准、一级行业、二级行业等。主要字段包括: 股票代码, 交易日期, 行业划分标准, 一级行业名称, 二级行业名称。"
+    },
+    {
+      "table_name": "基金规模变动表",
+      "columns": [
+        {
+          "name": "基金代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "基金简称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "公告日期",
+          "type": "TIMESTAMP",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "截止日期",
+          "type": "TIMESTAMP",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "报告期期初基金总份额",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "报告期基金总申购份额",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "报告期基金总赎回份额",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "报告期期末基金总份额",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "定期报告所属年度",
+          "type": "INTEGER",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "报告类型",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [],
+      "constraints": [],
+      "sample_data": {
+        "columns": [
+          "基金代码",
+          "基金简称",
+          "公告日期",
+          "截止日期",
+          "报告期期初基金总份额",
+          "报告期基金总申购份额",
+          "报告期基金总赎回份额",
+          "报告期期末基金总份额",
+          "定期报告所属年度",
+          "报告类型"
+        ],
+        "rows": [
+          [
+            "000028",
+            "华富安鑫债券",
+            "2019-04-20 00:00:00",
+            "2019-03-31 00:00:00",
+            344550555.65,
+            1811778.99,
+            18997687.33,
+            327364647.31,
+            2019,
+            "基金定期报告"
+          ],
+          [
+            "000030",
+            "长城核心优选灵活配置混合A",
+            "2019-04-22 00:00:00",
+            "2019-03-31 00:00:00",
+            1686849451.21,
+            2592968.41,
+            97884441.21,
+            1591557978.41,
+            2019,
+            "基金定期报告"
+          ],
+          [
+            "000037",
+            "广发景宁纯债债券A",
+            "2019-04-22 00:00:00",
+            "2019-03-31 00:00:00",
+            524340286.96,
+            3272117.58,
+            167762155.66,
+            359850248.88,
+            2019,
+            "基金定期报告"
+          ]
+        ]
+      },
+      "business_description": "记录基金规模的变动情况，包括申购、赎回、份额变化等信息。主要字段包括: 基金代码, 基金简称, 公告日期, 截止日期, 报告期期初基金总份额。"
+    },
+    {
+      "table_name": "基金份额持有人结构",
+      "columns": [
+        {
+          "name": "基金代码",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "基金简称",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "公告日期",
+          "type": "TIMESTAMP",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "截止日期",
+          "type": "TIMESTAMP",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "机构投资者持有的基金份额",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "机构投资者持有的基金份额占总份额比例",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "个人投资者持有的基金份额",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "个人投资者持有的基金份额占总份额比例",
+          "type": "REAL",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "定期报告所属年度",
+          "type": "INTEGER",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        },
+        {
+          "name": "报告类型",
+          "type": "TEXT",
+          "nullable": "YES",
+          "default": null,
+          "primary_key": false
+        }
+      ],
+      "indexes": [],
+      "constraints": [],
+      "sample_data": {
+        "columns": [
+          "基金代码",
+          "基金简称",
+          "公告日期",
+          "截止日期",
+          "机构投资者持有的基金份额",
+          "机构投资者持有的基金份额占总份额比例",
+          "个人投资者持有的基金份额",
+          "个人投资者持有的基金份额占总份额比例",
+          "定期报告所属年度",
+          "报告类型"
+        ],
+        "rows": [
+          [
+            "000006",
+            "西部利得量化成长混合A",
+            "2019-08-24 00:00:00",
+            "2019-06-30 00:00:00",
+            10000600.0,
+            7.24,
+            128087037.15,
+            92.76,
+            2019,
+            "中期报告"
+          ],
+          [
+            "000028",
+            "华富安鑫债券",
+            "2019-08-29 00:00:00",
+            "2019-06-30 00:00:00",
+            217513.79,
+            0.25,
+            88253498.14,
+            99.75,
+            2019,
+            "中期报告"
+          ],
+          [
+            "000030",
+            "长城核心优选灵活配置混合A",
+            "2019-08-27 00:00:00",
+            "2019-06-30 00:00:00",
+            18574577.58,
+            6.03,
+            289425324.34,
+            93.97,
+            2019,
+            "中期报告"
+          ]
+        ]
+      },
+      "business_description": "记录基金份额持有人的结构分布，包括机构投资者和个人投资者的占比。主要字段包括: 基金代码, 基金简称, 公告日期, 截止日期, 机构投资者持有的基金份额。"
+    }
+  ],
+  "relationships": [
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金基本信息",
+      "to_table": "基金股票持仓明细",
+      "field": "基金代码",
+      "description": "基金基本信息和基金股票持仓明细通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金基本信息",
+      "to_table": "基金债券持仓明细",
+      "field": "基金代码",
+      "description": "基金基本信息和基金债券持仓明细通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金基本信息",
+      "to_table": "基金可转债持仓明细",
+      "field": "基金代码",
+      "description": "基金基本信息和基金可转债持仓明细通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金基本信息",
+      "to_table": "基金日行情表",
+      "field": "基金代码",
+      "description": "基金基本信息和基金日行情表通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金基本信息",
+      "to_table": "基金规模变动表",
+      "field": "基金代码",
+      "description": "基金基本信息和基金规模变动表通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金基本信息",
+      "to_table": "基金份额持有人结构",
+      "field": "基金代码",
+      "description": "基金基本信息和基金份额持有人结构通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金股票持仓明细",
+      "to_table": "基金债券持仓明细",
+      "field": "基金代码",
+      "description": "基金股票持仓明细和基金债券持仓明细通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金股票持仓明细",
+      "to_table": "基金可转债持仓明细",
+      "field": "基金代码",
+      "description": "基金股票持仓明细和基金可转债持仓明细通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金股票持仓明细",
+      "to_table": "基金日行情表",
+      "field": "基金代码",
+      "description": "基金股票持仓明细和基金日行情表通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金股票持仓明细",
+      "to_table": "基金规模变动表",
+      "field": "基金代码",
+      "description": "基金股票持仓明细和基金规模变动表通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金股票持仓明细",
+      "to_table": "基金份额持有人结构",
+      "field": "基金代码",
+      "description": "基金股票持仓明细和基金份额持有人结构通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金债券持仓明细",
+      "to_table": "基金可转债持仓明细",
+      "field": "基金代码",
+      "description": "基金债券持仓明细和基金可转债持仓明细通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金债券持仓明细",
+      "to_table": "基金日行情表",
+      "field": "基金代码",
+      "description": "基金债券持仓明细和基金日行情表通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金债券持仓明细",
+      "to_table": "基金规模变动表",
+      "field": "基金代码",
+      "description": "基金债券持仓明细和基金规模变动表通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金债券持仓明细",
+      "to_table": "基金份额持有人结构",
+      "field": "基金代码",
+      "description": "基金债券持仓明细和基金份额持有人结构通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金可转债持仓明细",
+      "to_table": "基金日行情表",
+      "field": "基金代码",
+      "description": "基金可转债持仓明细和基金日行情表通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金可转债持仓明细",
+      "to_table": "基金规模变动表",
+      "field": "基金代码",
+      "description": "基金可转债持仓明细和基金规模变动表通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金可转债持仓明细",
+      "to_table": "基金份额持有人结构",
+      "field": "基金代码",
+      "description": "基金可转债持仓明细和基金份额持有人结构通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金日行情表",
+      "to_table": "基金规模变动表",
+      "field": "基金代码",
+      "description": "基金日行情表和基金规模变动表通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金日行情表",
+      "to_table": "基金份额持有人结构",
+      "field": "基金代码",
+      "description": "基金日行情表和基金份额持有人结构通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "基金规模变动表",
+      "to_table": "基金份额持有人结构",
+      "field": "基金代码",
+      "description": "基金规模变动表和基金份额持有人结构通过基金代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "A股票日行情表",
+      "to_table": "港股票日行情表",
+      "field": "股票代码",
+      "description": "A股票日行情表和港股票日行情表通过股票代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "A股票日行情表",
+      "to_table": "A股公司行业划分表",
+      "field": "股票代码",
+      "description": "A股票日行情表和A股公司行业划分表通过股票代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "A股票日行情表",
+      "to_table": "基金股票持仓明细",
+      "field": "股票代码",
+      "description": "A股票日行情表和基金股票持仓明细通过股票代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "港股票日行情表",
+      "to_table": "A股公司行业划分表",
+      "field": "股票代码",
+      "description": "港股票日行情表和A股公司行业划分表通过股票代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "港股票日行情表",
+      "to_table": "基金股票持仓明细",
+      "field": "股票代码",
+      "description": "港股票日行情表和基金股票持仓明细通过股票代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "A股公司行业划分表",
+      "to_table": "基金股票持仓明细",
+      "field": "股票代码",
+      "description": "A股公司行业划分表和基金股票持仓明细通过股票代码关联"
+    },
+    {
+      "type": "FOREIGN_KEY",
+      "from_table": "A股票日行情表",
+      "to_table": "港股票日行情表",
+      "field": "交易日",
+      "description": "A股票日行情表和港股票日行情表通过交易日关联"
+    }
+  ],
+  "business_summary": "这是一个金融数据库，包含10个核心表，涵盖基金、股票、债券等金融产品的完整信息。\n\n数据库主要包含以下业务域：\n1. 基金管理：基金基本信息、持仓明细、规模变动、份额持有人结构\n2. 股票市场：A股和港股的日行情数据、行业分类信息\n3. 债券投资：债券和可转债的持仓明细\n\n核心表关系：\n- 基金代码是连接基金相关表的主键\n- 股票代码连接股票相关表\n- 交易日期用于时间序列数据关联\n\n这个数据库支持金融投资分析、基金管理、市场行情查询等业务场景。",
+  "created_at": "2025-06-25T18:59:00.583930"
+}

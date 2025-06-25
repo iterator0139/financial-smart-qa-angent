@@ -12,6 +12,13 @@ logging:
   max_bytes: 52428800  # 50MB
   backup_count: 20
 
+# 向量化配置
+embedding:
+  model_name: 'all-MiniLM-L6-v2'  # sentence-transformers模型
+  cache_dir: '.cache/sentence_transformers'  # 模型缓存目录
+  batch_size: 32  # 批处理大小
+  max_length: 512  # 最大文本长度
+
 api:
   openai:
     timeout: 90
