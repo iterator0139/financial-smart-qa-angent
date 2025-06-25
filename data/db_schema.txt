@@ -1,0 +1,118 @@
+
+数据库基本信息
+
+基金基本信息 表结构:
+基金代码 (TEXT) 
+基金全称 (TEXT) 
+基金简称 (TEXT) 
+管理人 (TEXT) 
+托管人 (TEXT) 
+基金类型 (TEXT) 
+成立日期 (TEXT) 
+到期日期 (TEXT) 
+管理费率 (TEXT) 
+托管费率 (TEXT) 
+
+基金股票持仓明细 表结构:
+基金代码 (TEXT) 
+基金简称 (TEXT) 
+持仓日期 (TEXT) 
+股票代码 (TEXT) 
+股票名称 (TEXT) 
+数量 (REAL) 
+市值 (REAL) 
+市值占基金资产净值比 (REAL) 
+第N大重仓股 (INTEGER) 
+所在证券市场 (TEXT) 
+所属国家(地区) (TEXT) 
+报告类型 (TEXT) 
+
+基金债券持仓明细
+表结构:
+基金代码 (TEXT) 
+基金简称 (TEXT) 
+持仓日期 (TEXT) 
+债券类型 (TEXT) 
+债券名称 (TEXT) 
+持债数量 (REAL) 
+持债市值 (REAL) 
+持债市值占基金资产净值比 (REAL) 
+第N大重仓股 (INTEGER) 
+所在证券市场 (TEXT) 
+所属国家(地区) (TEXT) 
+报告类型 (TEXT) 
+
+基金可转债持仓明细 表结构:
+基金代码 (TEXT) 
+基金简称 (TEXT) 
+持仓日期 (TEXT) 
+对应股票代码 (TEXT) 
+债券名称 (TEXT) 
+数量 (REAL) 
+市值 (REAL) 
+市值占基金资产净值比 (REAL) 
+第N大重仓股 (INTEGER) 
+所在证券市场 (TEXT) 
+所属国家(地区) (TEXT) 
+报告类型 (TEXT) 
+
+基金日行情表 表结构:
+基金代码 (TEXT) 
+交易日期 (TEXT) 
+单位净值 (REAL) 
+复权单位净值 (REAL) 
+累计单位净值 (REAL) 
+资产净值 (REAL) 
+
+A股票日行情表 表结构:
+股票代码 (TEXT) 
+交易日 (TEXT) 
+昨收盘(元) (REAL) 
+今开盘(元) (REAL) 
+最高价(元) (REAL) 
+最低价(元) (REAL) 
+收盘价(元) (REAL) 
+成交量(股) (REAL) 
+成交金额(元) (REAL) 
+
+港股票日行情表 表结构:
+股票代码 (TEXT) 
+交易日 (TEXT) 
+昨收盘(元) (REAL) 
+今开盘(元) (REAL) 
+最高价(元) (REAL) 
+最低价(元) (REAL) 
+收盘价(元) (REAL) 
+成交量(股) (REAL) 
+成交金额(元) (REAL) 
+
+A股公司行业划分表 表结构:
+股票代码 (TEXT) 
+交易日期 (TEXT) 
+行业划分标准 (TEXT) 
+一级行业名称 (TEXT) 
+二级行业名称 (TEXT) 
+
+基金规模变动表 表结构:
+基金代码 (TEXT) 
+基金简称 (TEXT) 
+公告日期 (TIMESTAMP) 
+截止日期 (TIMESTAMP) 
+报告期期初基金总份额 (REAL) 
+报告期基金总申购份额 (REAL) 
+报告期基金总赎回份额 (REAL) 
+报告期期末基金总份额 (REAL) 
+定期报告所属年度 (INTEGER) 
+报告类型 (TEXT) 
+
+基金份额持有人结构 表结构:
+基金代码 (TEXT) 
+基金简称 (TEXT) 
+公告日期 (TIMESTAMP) 
+截止日期 (TIMESTAMP) 
+机构投资者持有的基金份额 (REAL) 
+机构投资者持有的基金份额占总份额比例 (REAL) 
+个人投资者持有的基金份额 (REAL) 
+个人投资者持有的基金份额占总份额比例 (REAL) 
+定期报告所属年度 (INTEGER) 
+报告类型 (TEXT) 
