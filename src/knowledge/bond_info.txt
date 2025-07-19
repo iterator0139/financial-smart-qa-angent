@@ -1,0 +1,10 @@
+
+表名:基金基本信息表
+表描述: 存储单个基金的基本信息
+列:
+*   ProductID: INT PRIMARY KEY - 产品的唯一标识符。
+*   ProductName: NVARCHAR(100) NOT NULL - 产品的正式名称。
+*   Category: NVARCHAR(50) - 产品所属的分类（如：笔记本、手机、配件）。
+*   RRP: DECIMAL(10, 2) - 产品的制造商建议零售价。
+*   CurrentStock: INT - 当前仓库中的可用库存数量。
+*   Description: TEXT - 详细的产品描述，包含特性和规格。

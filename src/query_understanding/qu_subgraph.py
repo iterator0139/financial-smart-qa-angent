@@ -49,6 +49,13 @@ def intent_recognition_node(state: QuState) -> dict:
         "intent": intent
     }
 
+def join_node(state: QuState) -> dict:
+    return {
+        "segmented_words": state.get("segmented_words"),
+        "entities": state.get("entities"),
+        "intent": state.get("intent")
+    }   
+
 
 
 def build_qu_subgraph() -> StateGraph:
@@ -60,14 +67,14 @@ def build_qu_subgraph() -> StateGraph:
     qu_graph.add_node("word_segmentation", word_segmentation_node)
     qu_graph.add_node("ner", ner_node)
     qu_graph.add_node("intent_recognition", intent_recognition_node)
-    
+    qu_graph.add_node("join", join_node)
     # Set the entry point - we'll branch from here to all parallel nodes
     qu_graph.add_edge(START, "word_segmentation")
     qu_graph.add_edge(START, "ner")
     qu_graph.add_edge(START, "intent_recognition")
-    qu_graph.add_edge("word_segmentation", END)
-    qu_graph.add_edge("ner", END)
-    qu_graph.add_edge("intent_recognition", END)
-
+    qu_graph.add_edge("word_segmentation", "join")
+    qu_graph.add_edge("ner", "join")
+    qu_graph.add_edge("intent_recognition", "join")
+    qu_graph.add_edge("join", END)
     # Compile the graph
     return qu_graph.compile() 

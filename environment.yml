@@ -23,3 +23,6 @@ dependencies:
     - einops
     - dashscope
     - langchain-core
+    - sentence-transformers
+    - pymilvus
+    - numpy
