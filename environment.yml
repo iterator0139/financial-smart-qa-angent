@@ -27,3 +27,6 @@ dependencies:
     - pymilvus
     - numpy
     - pymysql
+    - langchain-community
+    - langchain-openai
+    - openai

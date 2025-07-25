@@ -194,15 +194,18 @@ class StreamingLLMAdapter(BaseChatModel):
         for tool in self._tools:
             tools_description += f"- {tool.name}: {tool.description}\n"
         
-        # 构建工具调用格式说明
+        # 构建工具调用格式说明 - 使用LangGraph ReAct格式
         format_instruction = """
 请使用以下格式调用工具:
+
+Question: 用户问题
+Thought: 我需要思考如何解决这个问题
 Action: 工具名称
 Action Input: 工具输入参数
-
-例如:
-Action: TestTool
-Action Input: 要处理的数据
+Observation: 工具输出结果
+... (可以重复多次)
+Thought: 我现在知道答案了
+Final Answer: 最终答案
 
 请根据用户需求选择合适的工具并调用。
 """
@@ -211,7 +214,7 @@ Action Input: 要处理的数据
         user_message = messages[-1].content if messages else ""
         
         # 组合完整的prompt
-        full_prompt = f"{tools_description}\n{format_instruction}\n\n用户问题: {user_message}\n\n请回答:"
+        full_prompt = f"{tools_description}\n{format_instruction}\n\nQuestion: {user_message}\nThought:"
         
         return full_prompt
     
@@ -227,17 +230,27 @@ Action Input: 要处理的数据
         """
         tool_calls = []
         
-        # 简单的解析逻辑，查找Action和Action Input模式
+        # 添加调试信息
+        log.info(f"开始解析工具调用，内容长度: {len(content)}")
+        log.info(f"内容预览: {content[:200]}...")
+        
+        # 解析LangGraph ReAct格式的工具调用
         lines = content.split('\n')
         current_action = None
         current_input = None
         
         for i, line in enumerate(lines):
             line = line.strip()
+            
+            # 匹配Action行
             if line.startswith('Action:'):
                 current_action = line.replace('Action:', '').strip()
+                log.info(f"找到Action: {current_action}")
+                
+            # 匹配Action Input行 - 修复格式匹配
             elif line.startswith('Action Input:'):
                 current_input = line.replace('Action Input:', '').strip()
+                log.info(f"找到Action Input: {current_input}")
                 
                 # 如果找到了工具名称和输入，创建工具调用
                 if current_action and current_input:
@@ -245,18 +258,26 @@ Action Input: 要处理的数据
                     try:
                         import json
                         args = json.loads(current_input)
+                        log.info(f"JSON解析成功: {args}")
                     except (json.JSONDecodeError, ValueError):
-                        # 如果不是JSON格式，将其作为字符串参数
+                        # 如果不是JSON格式，将其作为字典参数
                         args = {"input": current_input}
+                        log.info(f"使用默认参数格式: {args}")
                     
-                    tool_calls.append({
+                    # 使用正确的LangChain工具调用格式
+                    tool_call = {
                         "id": f"call_{len(tool_calls)}_{i}",
+                        "type": "tool_call",
                         "name": current_action,
                         "args": args
-                    })
+                    }
+                    
+                    log.info(f"创建工具调用: {tool_call}")
+                    tool_calls.append(tool_call)
                     current_action = None
                     current_input = None
         
+        log.info(f"解析完成，共找到 {len(tool_calls)} 个工具调用")
         return tool_calls
     
     def _generate(

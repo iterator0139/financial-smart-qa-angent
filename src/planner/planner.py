@@ -13,8 +13,9 @@ from langchain_core.tools import Tool
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage, SystemMessage
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
-from langgraph.prebuilt import ToolNode, create_react_agent
+from langgraph.prebuilt import ToolNode
 from langchain_core.callbacks import BaseCallbackHandler
+import re
 
 # Add project root to path first
 project_root = Path(__file__).resolve().parent.parent.parent
@@ -66,8 +67,20 @@ tools = [
         description="Check the DB info",
         func=check_db_info
     ),
-
 ]
+
+# 定义状态类型
+class AgentState(TypedDict):
+    """Agent执行状态"""
+    messages: List[Dict[str, Any]]  # 消息历史
+    current_step: int  # 当前步骤
+    max_steps: int  # 最大步骤数
+    scratchpad: str  # 推理过程记录
+    tool_results: List[Dict[str, Any]]  # 工具执行结果
+    final_answer: Optional[str]  # 最终答案
+    error: Optional[str]  # 错误信息
+    is_finished: bool  # 是否完成
+
 
 class ResponseFormat(BaseModel):
     """Response format for the agent."""
@@ -145,16 +158,18 @@ class ToolExecutionCallback(BaseCallbackHandler):
         }
 
 
-class ReActAgent:
+class CustomReActAgent:
     """
-    标准的ReAct Agent实现
+    自定义ReAct Agent实现
     
-    基于LangGraph的create_react_agent构建，支持：
+    基于LangGraph构建，支持：
+    - 完全可控的推理流程
     - 工具调用
     - 流式输出
     - 状态管理
     - 错误处理
     - 详细的执行日志
+    - 可定制的推理步骤
     """
     
     def __init__(
@@ -163,60 +178,301 @@ class ReActAgent:
         tools: Optional[List[Tool]] = None,
         prompt: Optional[str] = None,
         config: Optional[Dict[str, Any]] = None,
-
+        max_steps: int = 10,
         **kwargs
     ):
         """
-        初始化ReAct Agent
+        初始化自定义ReAct Agent
         
         Args:
             model_name: 模型名称
             tools: 工具列表
             prompt: 自定义prompt
             config: 配置管理器
-            enable_logging: 是否启用详细日志
+            max_steps: 最大推理步骤数
             **kwargs: 其他参数
         """
         self.model_name = model_name
         self.tools = tools or []
         self.prompt = prompt or REACT_PROMPT
         self.config = config
+        self.max_steps = max_steps
         self.log = get_logger()
         
         # 初始化回调处理器
-        self.callback_handler = ToolExecutionCallback() 
+        self.callback_handler = ToolExecutionCallback()
         
         # 初始化模型
         self.llm = StreamingLLMAdapter(
-                model=model_name,
-                api_key=self.config.get("api.qwen.api_key"),
-                base_url=self.config.get("api.qwen.base_url"),
-                streaming_models=self.config.get("api.qwen.streaming_models"),
-                stream_enabled=self.config.get("api.qwen.stream_enabled"),
-                default_params=self.config.get("api.qwen.default_params"),
-                **kwargs
-            )
-        
-        # 创建ReAct agent（已经是编译好的图）
-        self.app = self._create_agent()
-        
-        self.log.info(f"ReAct Agent initialized with model: {self.model_name}")
-    
-    def _create_agent(self):
-        """
-        创建ReAct agent
-        
-        Returns:
-            LangGraph agent实例
-        """
-        
-        agent = create_react_agent(
-            model=self.llm,
-            tools=self.tools,
-            prompt=self.prompt,
+            model=model_name,
+            api_key=self.config.get("api.qwen.api_key"),
+            base_url=self.config.get("api.qwen.base_url"),
+            streaming_models=self.config.get("api.qwen.streaming_models"),
+            stream_enabled=self.config.get("api.qwen.stream_enabled"),
+            default_params=self.config.get("api.qwen.default_params"),
+            **kwargs
         )
         
-        return agent
+        # 创建工具映射
+        self.tool_map = {tool.name: tool for tool in self.tools}
+        
+        # 创建自定义ReAct图
+        self.app = self._create_custom_react_graph()
+        
+        self.log.info(f"Custom ReAct Agent initialized with model: {model_name}, max_steps: {max_steps}")
+    
+    def _create_custom_react_graph(self):
+        """
+        创建自定义ReAct执行图
+        
+        Returns:
+            LangGraph StateGraph实例
+        """
+        # 创建状态图
+        workflow = StateGraph(AgentState)
+        
+        # 添加节点
+        workflow.add_node("agent", self._agent_node)
+        workflow.add_node("tools", self._tools_node)
+        
+        # 设置入口和出口
+        workflow.set_entry_point("agent")
+        
+        # 添加条件边
+        workflow.add_conditional_edges(
+            "agent",
+            self._should_continue,
+            {
+                "tools": "tools",
+                "end": END
+            }
+        )
+        
+        workflow.add_edge("tools", "agent")
+        
+        # 编译图
+        return workflow.compile()
+    
+    def _agent_node(self, state: AgentState) -> AgentState:
+        """
+        Agent推理节点
+        
+        Args:
+            state: 当前状态
+            
+        Returns:
+            更新后的状态
+        """
+        try:
+            # 增加步骤计数
+            state["current_step"] += 1
+            self.log.info(f"[AGENT_NODE] 步骤 {state['current_step']} - 开始推理")
+            
+            # 构建完整的prompt
+            full_prompt = self._build_prompt(state)
+            
+            # 调用LLM
+            response = self.llm.invoke(full_prompt)
+            
+            # 解析响应
+            parsed_response = self._parse_agent_response(response)
+            
+            # 更新状态
+            state["scratchpad"] += f"\n{parsed_response['thought']}\n{parsed_response['action']}"
+            
+            if parsed_response["action_type"] == "finish":
+                state["final_answer"] = parsed_response["action_input"]
+                state["is_finished"] = True
+                self.log.info(f"[AGENT_NODE] 推理完成，最终答案: {state['final_answer']}")
+            else:
+                # 准备工具调用
+                state["next_tool"] = {
+                    "name": parsed_response["action_input"],
+                    "input": parsed_response.get("tool_input", "")
+                }
+                self.log.info(f"[AGENT_NODE] 准备调用工具: {parsed_response['action_input']}")
+            
+            return state
+            
+        except Exception as e:
+            self.log.error(f"[AGENT_NODE] 推理失败: {e}")
+            state["error"] = str(e)
+            state["is_finished"] = True
+            return state
+    
+    def _tools_node(self, state: AgentState) -> AgentState:
+        """
+        工具执行节点
+        
+        Args:
+            state: 当前状态
+            
+        Returns:
+            更新后的状态
+        """
+        try:
+            tool_info = state.get("next_tool")
+            if not tool_info:
+                state["error"] = "No tool to execute"
+                state["is_finished"] = True
+                return state
+            
+            tool_name = tool_info["name"]
+            tool_input = tool_info["input"]
+            
+            self.log.info(f"[TOOLS_NODE] 执行工具: {tool_name}")
+            
+            # 查找工具
+            if tool_name not in self.tool_map:
+                error_msg = f"Tool '{tool_name}' not found"
+                self.log.error(f"[TOOLS_NODE] {error_msg}")
+                state["error"] = error_msg
+                state["is_finished"] = True
+                return state
+            
+            tool = self.tool_map[tool_name]
+            
+            # 执行工具
+            try:
+                tool_result = tool.func(tool_input)
+                self.log.info(f"[TOOLS_NODE] 工具执行成功: {tool_result}")
+                
+                # 添加工具结果到状态
+                state["tool_results"].append({
+                    "tool": tool_name,
+                    "input": tool_input,
+                    "output": tool_result,
+                    "step": state["current_step"]
+                })
+                
+                # 添加观察结果到scratchpad
+                state["scratchpad"] += f"\nObservation: {tool_result}"
+                
+            except Exception as e:
+                error_msg = f"Tool execution failed: {str(e)}"
+                self.log.error(f"[TOOLS_NODE] {error_msg}")
+                state["error"] = error_msg
+                state["is_finished"] = True
+                return state
+            
+            # 清理next_tool
+            if "next_tool" in state:
+                del state["next_tool"]
+            
+            return state
+            
+        except Exception as e:
+            self.log.error(f"[TOOLS_NODE] 工具节点执行失败: {e}")
+            state["error"] = str(e)
+            state["is_finished"] = True
+            return state
+    
+    def _should_continue(self, state: AgentState) -> str:
+        """
+        判断是否应该继续执行
+        
+        Args:
+            state: 当前状态
+            
+        Returns:
+            下一个节点名称
+        """
+        # 检查是否完成
+        if state.get("is_finished", False):
+            return "end"
+        
+        # 检查步骤数限制
+        if state["current_step"] >= state["max_steps"]:
+            state["error"] = f"Maximum steps ({state['max_steps']}) reached"
+            state["is_finished"] = True
+            return "end"
+        
+        # 检查是否有工具需要执行
+        if "next_tool" in state:
+            return "tools"
+        
+        # 继续推理
+        return "end"
+    
+    def _build_prompt(self, state: AgentState) -> str:
+        """
+        构建完整的prompt
+        
+        Args:
+            state: 当前状态
+            
+        Returns:
+            完整的prompt字符串
+        """
+        # 获取工具描述
+        tools_description = "\n".join([
+            f"- {tool.name}: {tool.description}" 
+            for tool in self.tools
+        ])
+        
+        # 获取用户输入
+        user_input = ""
+        if state["messages"]:
+            user_input = state["messages"][-1].get("content", "")
+        
+        # 构建prompt
+        prompt = self.prompt.format(
+            tools=tools_description,
+            input=user_input,
+            agent_scratchpad=state["scratchpad"]
+        )
+        
+        return prompt
+    
+    def _parse_agent_response(self, response: str) -> Dict[str, Any]:
+        """
+        解析Agent响应
+        
+        Args:
+            response: LLM响应
+            
+        Returns:
+            解析后的响应字典
+        """
+        try:
+            # 提取Thought
+            thought_match = re.search(r'Thought\s*\d*:\s*(.*?)(?=\nAction|\n$)', response, re.DOTALL)
+            thought = thought_match.group(1).strip() if thought_match else ""
+            
+            # 提取Action
+            action_match = re.search(r'Action\s*\d*:\s*(.*?)(?=\n|$)', response, re.DOTALL)
+            action = action_match.group(1).strip() if action_match else ""
+            
+            # 解析Action
+            if action.lower().startswith("finish"):
+                # 提取最终答案
+                answer_match = re.search(r'finish\[(.*?)\]', action, re.IGNORECASE)
+                answer = answer_match.group(1) if answer_match else action
+                
+                return {
+                    "thought": thought,
+                    "action": action,
+                    "action_type": "finish",
+                    "action_input": answer
+                }
+            else:
+                # 工具调用
+                tool_name = action.strip()
+                return {
+                    "thought": thought,
+                    "action": action,
+                    "action_type": "tool",
+                    "action_input": tool_name
+                }
+                
+        except Exception as e:
+            self.log.error(f"Failed to parse agent response: {e}")
+            return {
+                "thought": "",
+                "action": "",
+                "action_type": "error",
+                "action_input": str(e)
+            }
     
     def invoke(self, input_text: str) -> Dict[str, Any]:
         """
@@ -231,26 +487,42 @@ class ReActAgent:
             self.log.info(f"[AGENT_START] 开始执行Agent推理")
             self.log.info(f"[AGENT_INPUT] 输入: {input_text}")
             
-            # 准备输入 - LangGraph期望messages格式
-            inputs = {
-                "messages": [{"role": "user", "content": input_text}]
+            # 初始化状态
+            initial_state = {
+                "messages": [{"role": "user", "content": input_text}],
+                "current_step": 0,
+                "max_steps": self.max_steps,
+                "scratchpad": "",
+                "tool_results": [],
+                "final_answer": None,
+                "error": None,
+                "is_finished": False
             }
             
             # 准备回调
-            callbacks = [self.callback_handler] 
+            callbacks = [self.callback_handler]
             
-            # 执行agent
-            result = self.app.invoke(inputs, config={"callbacks": callbacks})
+            # 执行图
+            result = self.app.invoke(initial_state, config={"callbacks": callbacks})
             
             self.log.info(f"[AGENT_END] Agent推理完成")
             
-            # 添加工具执行摘要到结果中
+            # 构建返回结果
+            response = {
+                "final_answer": result.get("final_answer"),
+                "error": result.get("error"),
+                "scratchpad": result.get("scratchpad"),
+                "tool_results": result.get("tool_results", []),
+                "steps_taken": result.get("current_step", 0)
+            }
+            
+            # 添加工具执行摘要
             if self.callback_handler:
                 tool_summary = self.callback_handler.get_tool_execution_summary()
-                result["tool_execution_summary"] = tool_summary
+                response["tool_execution_summary"] = tool_summary
                 self.log.info(f"[TOOL_SUMMARY] 工具执行摘要: {tool_summary}")
             
-            return result
+            return response
             
         except Exception as e:
             self.log.error(f"[AGENT_ERROR] Agent执行失败: {e}")
@@ -270,16 +542,23 @@ class ReActAgent:
             self.log.info(f"[AGENT_STREAM_START] 开始流式执行Agent推理")
             self.log.info(f"[AGENT_INPUT] 输入: {input_text}")
             
-            # 准备输入 - LangGraph期望messages格式
-            inputs = {
-                "messages": [{"role": "user", "content": input_text}]
+            # 初始化状态
+            initial_state = {
+                "messages": [{"role": "user", "content": input_text}],
+                "current_step": 0,
+                "max_steps": self.max_steps,
+                "scratchpad": "",
+                "tool_results": [],
+                "final_answer": None,
+                "error": None,
+                "is_finished": False
             }
             
             # 准备回调
-            callbacks = [self.callback_handler] 
+            callbacks = [self.callback_handler]
             
-            # 流式执行agent
-            for chunk in self.app.stream(inputs, config={"callbacks": callbacks}):
+            # 流式执行图
+            for chunk in self.app.stream(initial_state, config={"callbacks": callbacks}):
                 yield chunk
                 
             self.log.info(f"[AGENT_STREAM_END] 流式执行完成")
@@ -296,8 +575,7 @@ class ReActAgent:
             tool: 要添加的工具
         """
         self.tools.append(tool)
-        # 重新创建agent以包含新工具
-        self.app = self._create_agent()
+        self.tool_map[tool.name] = tool
         self.log.info(f"Added tool: {tool.name}")
     
     def remove_tool(self, tool_name: str):
@@ -308,8 +586,8 @@ class ReActAgent:
             tool_name: 要移除的工具名称
         """
         self.tools = [tool for tool in self.tools if tool.name != tool_name]
-        # 重新创建agent
-        self.app = self._create_agent()
+        if tool_name in self.tool_map:
+            del self.tool_map[tool_name]
         self.log.info(f"Removed tool: {tool_name}")
     
     def get_tools(self) -> List[Tool]:
@@ -329,9 +607,17 @@ class ReActAgent:
             new_prompt: 新的prompt模板
         """
         self.prompt = new_prompt
-        # 重新创建agent
-        self.app = self._create_agent()
         self.log.info("Updated agent prompt")
+    
+    def set_max_steps(self, max_steps: int):
+        """
+        设置最大推理步骤数
+        
+        Args:
+            max_steps: 最大步骤数
+        """
+        self.max_steps = max_steps
+        self.log.info(f"Updated max steps to: {max_steps}")
     
     def get_execution_summary(self) -> Dict[str, Any]:
         """
@@ -345,37 +631,37 @@ class ReActAgent:
         return {"total_tools": 0, "tools": []}
 
 
-# 创建默认的ReAct Agent实例
-def create_default_react_agent(
+# 创建默认的自定义ReAct Agent实例
+def create_default_custom_react_agent(
     model_name: str = "qwen-turbo",
     custom_tools: Optional[List[Tool]] = None,
     custom_prompt: Optional[str] = None,
-
+    max_steps: int = 10,
     **kwargs
-) -> ReActAgent:
+) -> CustomReActAgent:
     """
-    创建默认的ReAct Agent实例
+    创建默认的自定义ReAct Agent实例
     
     Args:
         model_name: 模型名称
         custom_tools: 自定义工具列表
         custom_prompt: 自定义prompt
-        enable_logging: 是否启用详细日志
+        max_steps: 最大推理步骤数
         **kwargs: 其他参数
         
     Returns:
-        ReActAgent实例
+        CustomReActAgent实例
     """
     # 使用默认工具或自定义工具
     agent_tools = custom_tools if custom_tools is not None else tools
     
-    return ReActAgent(
+    return CustomReActAgent(
         model_name=model_name,
         tools=agent_tools,
         prompt=custom_prompt,
+        max_steps=max_steps,
         **kwargs
     )
-
 
 
 def main():
@@ -392,11 +678,12 @@ def main():
     config_dir = Path(__file__).resolve().parent.parent / "conf"
     config.init(config_dir)
     
-    # 创建ReAct Agent
-    logger.info("初始化ReAct Agent...")
-    agent = create_default_react_agent(
+    # 创建自定义ReAct Agent
+    logger.info("初始化自定义ReAct Agent...")
+    agent = create_default_custom_react_agent(
         model_name="qwen-turbo",
-        config=config
+        config=config,
+        max_steps=8
     )
     
     # 示例查询列表
@@ -411,7 +698,13 @@ def main():
         # 使用新版本的invoke方法
         result = agent.invoke(query)
         
-   
+        print(f"最终答案: {result.get('final_answer')}")
+        print(f"推理步骤: {result.get('steps_taken')}")
+        print(f"工具调用次数: {len(result.get('tool_results', []))}")
+        
+        if result.get('error'):
+            print(f"错误信息: {result['error']}")
+        
         logger.info(f"查询结果: {result}")
         
     except Exception as e:
@@ -429,7 +722,7 @@ def demo_streaming():
     print("="*60)
     
     # 创建agent
-    agent = create_default_react_agent()
+    agent = create_default_custom_react_agent()
     
     # 流式查询
     query = "请帮我检查数据库信息"
@@ -445,11 +738,8 @@ def demo_streaming():
         print(f"❌ 流式查询失败: {e}")
 
 
-
-
 if __name__ == "__main__":
     # 运行基本示例
     main()    
     # 运行其他演示
     # demo_streaming()
-    # demo_custom_tools()
