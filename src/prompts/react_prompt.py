@@ -1,9 +1,14 @@
-plan_react_prompt = """
-Example:
-请帮我计算，在20210105，中信行业分类划分的一级行业为综合金融行业中，涨跌幅最大股票的股票代码是？涨跌幅是多少？百分数保留两位小数。股票涨跌幅定义为：（收盘价 - 前一日收盘价 / 前一日收盘价）* 100%。
+REACT_PROMPT = '''
+Answer the following questions as best you can. You have access to the following tools:
+
+{tools}
+
+Use the following format:
+
+Question: 请帮我计算，在20210105，中信行业分类划分的一级行业为综合金融行业中，涨跌幅最大股票的股票代码是？涨跌幅是多少？百分数保留两位小数。股票涨跌幅定义为：（收盘价 - 前一日收盘价 / 前一日收盘价）* 100%。
 
 Thought 1 我需要查看已有信息，结合任务描述，判断这是一个文档信息查询任务，还是数据库信息查询任务。
-Action 1 CheckDBInfo
+Action 1 [{tool_names}]
 Observation 1 
 数据库基本信息
 基金基本信息 表结构:
@@ -128,7 +133,7 @@ Thought 2
 DB中有A股票日行情表和港股股票日行情表，可以查询到股票代码和涨跌幅。所以这是一个数据库信息查询任务。
 下一步我需要根据已有的DB表数据，将任务要求转换为SQL查询语句，并执行查询。
 
-Action 2 [QueryToSQL]
+Action 2 [{tool_names}]
 Observation 2 
 SELECT "股票代码" ,   ROUND((("收盘价(元)" - "昨收盘(元)") / "昨收盘(元)" * 100),2) AS "涨跌幅" 
 FROM "A股票日行情表" 
@@ -138,14 +143,33 @@ ORDER BY "涨跌幅" DESC
 LIMIT 1;
 
 Thought 3 我需要执行SQL查询语句，获取涨跌幅最大股票的股票代码和涨跌幅。
-Action 3 [QueryDB]
+Action 3 [{tool_names}]
 Observation 3 
-{
+{{
     "股票代码": "600120",
     "涨跌幅": 0.0
-}
+}}
 
 Thought 4 在20210105，中信行业分类划分的一级行业为综合金融行业中，涨跌幅最大股票的股票代码是600120，涨跌幅是0.00%。
 Action 4 Finish[SUPPORTS]
 
-"""
+IMPORTANT: You MUST follow this format EXACTLY:
+1. ALWAYS start with "Thought N" before any "Action N"
+2. Use the EXACT tool names from the tools list (no brackets, no extra formatting)
+3. End with "Action N Finish[RESULT]" when done
+4. Do NOT skip any Thought steps
+5. Do NOT put Thought after Action
+6. Each Thought must explain your reasoning before taking an Action
+7. Each Action must use a valid tool name from the available tools
+8. Do NOT include code blocks or markdown formatting in Action inputs
+9. Keep Action inputs simple and direct
+10. Do NOT use brackets [] around tool names in Action
+11. Do NOT include SQL code in Action inputs, only describe what you want to do
+12. Use simple text for Action inputs, not complex queries
+
+请你完成以下任务：
+Begin!
+
+Question: {input}
+Thought:{agent_scratchpad}'''
+
