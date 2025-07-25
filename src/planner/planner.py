@@ -410,6 +410,9 @@ class CustomReActAgent:
             for tool in self.tools
         ])
         
+        # 获取工具名称列表
+        tool_names = ", ".join([tool.name for tool in self.tools])
+        
         # 获取用户输入
         user_input = ""
         if state["messages"]:
@@ -418,6 +421,7 @@ class CustomReActAgent:
         # 构建prompt
         prompt = self.prompt.format(
             tools=tools_description,
+            tool_names=tool_names,
             input=user_input,
             agent_scratchpad=state["scratchpad"]
         )

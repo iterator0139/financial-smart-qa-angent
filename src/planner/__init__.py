@@ -3,9 +3,11 @@ Planner module
 """
 
 from src.planner.planner import (
-    ReActAgent
+    CustomReActAgent,
+    create_default_custom_react_agent
 )
 
 __all__ = [
-    'ReActAgent'
+    'CustomReActAgent',
+    'create_default_custom_react_agent'
 ] 
