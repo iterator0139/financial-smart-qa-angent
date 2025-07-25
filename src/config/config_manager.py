@@ -118,8 +118,23 @@ class ConfigManager:
 
     def _merge_config(self, config_data: Dict[str, Any]) -> None:
         """Merge new configuration data with existing config"""
+        # 处理环境变量替换
+        config_data = self._replace_env_vars(config_data)
         # 保持向后兼容性，尝试两种方式合并配置
         self._merge_direct_config(config_data)
+    
+    def _replace_env_vars(self, data: Any) -> Any:
+        """递归替换配置中的环境变量"""
+        if isinstance(data, dict):
+            return {key: self._replace_env_vars(value) for key, value in data.items()}
+        elif isinstance(data, list):
+            return [self._replace_env_vars(item) for item in data]
+        elif isinstance(data, str) and data.startswith("${") and data.endswith("}"):
+            # 提取环境变量名
+            env_var = data[2:-1]
+            return os.getenv(env_var, data)  # 如果环境变量不存在，返回原值
+        else:
+            return data
 
     def get(self, key: str, default: Any = None) -> Any:
         """Get configuration value by key path"""
